@@ -1,7 +1,7 @@
 """4개 센터 강좌 CSV + 올림픽공원 공연 일정 HTML -> 화면용 olpark.json
 사용: python3 -I scripts/build_data.py data_raw olpark.json
 """
-import sys, os, re, json, html as H, datetime as dt
+import sys, os, re, json, hashlib, html as H, datetime as dt
 import pandas as pd
 
 RAW, OUT = sys.argv[1], sys.argv[2]
@@ -193,12 +193,40 @@ items = from_json(EVJSON) if os.path.exists(EVJSON) else from_html(f"{RAW}/ev.ht
 events = [e for it in items for e in expand(*it)]
 events.sort(key=lambda e: (e["date"], e["v"]))
 
-# 화면용 압축 형식: rows = [센터번호, 공원내(0/1), 종목, 강좌명, 시작분, 종료분, 요일비트(월=1), 대상, 월수강료, 정원]
+# ---- 기관 강좌 소개(스포츠센터 강좌 정보, 15147992): 종목별 소개·수준별 진도·요금 안내 링크 ----
 centers = [c for _, c, _, _ in SPEC]
+norm = lambda s: re.sub(r"[\s()·.\-]", "", str(s)).upper()
+info, info_key = [], {}
+INFO = f"{RAW}/course_info.csv"
+if os.path.exists(INFO):
+    ci = pd.read_csv(INFO, dtype=str)
+    for _, r in ci.iterrows():
+        c = "올림픽공원스포츠센터" if r["스포츠센터"] == "올림픽테니스장" else r["스포츠센터"]  # 테니스 강좌는 공원SC 데이터에 있음
+        if c not in centers:
+            continue
+        info_key.setdefault(c, []).append((norm(r["강좌명"]), len(info)))
+        info.append([str(r["강좌명"]).strip(), str(r["링크주소"]).strip()])
+
+
+def info_of(center, sp):
+    n = norm(sp)
+    if not n or n == "NAN":
+        return -1
+    cand = [(k, i) for k, i in info_key.get(center, []) if n == k]
+    cand = cand or [(k, i) for k, i in info_key.get(center, []) if len(k) >= 2 and (n in k or k in n)]
+    return min(cand, key=lambda x: len(x[0]))[1] if cand else -1
+
+
+def cid(x):  # 강좌 고유 번호: 공연일 알림 구독 주소에 쓰므로 데이터가 갱신돼도 바뀌지 않게
+    key = f'{x["c"]}|{x["n"]}|{x["s"]}|{x["e"]}|{"".join(map(str, x["d"]))}'
+    return hashlib.sha1(key.encode()).hexdigest()[:10]
+
+
+# 화면용 압축 형식: rows = [센터번호, 공원내(0/1), 종목, 강좌명, 시작분, 종료분, 요일비트(월=1), 대상, 월수강료, 정원, 강좌번호, 강좌소개번호]
 rows = [[centers.index(x["c"]), int(x["park"]), x["sp"], x["n"], x["s"], x["e"],
-         sum(1 << i for i in x["d"]), x["t"], x["p"], x["cap"]] for x in courses]
+         sum(1 << i for i in x["d"]), x["t"], x["p"], x["cap"], cid(x), info_of(x["c"], x["sp"])] for x in courses]
 evs = [[e["date"], e["v"], e["title"], e["s"]] for e in events]
-json.dump(dict(centers=centers, stats=stats, events=evs, rows=rows,
+json.dump(dict(centers=centers, stats=stats, events=evs, rows=rows, info=info,
                built=(dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=9)).strftime("%Y-%m-%d %H:%M")),
           open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print(json.dumps(stats, ensure_ascii=False, indent=1))

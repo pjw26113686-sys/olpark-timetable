@@ -26,13 +26,15 @@ jobs:
         run: python3 -I scripts/fetch_events.py data_raw/events.json 3
       - name: 화면 데이터 다시 만들기
         run: python3 -I scripts/build_data.py data_raw olpark.json
+      - name: 공연일 알림 구독 캘린더 다시 만들기
+        run: python3 -I scripts/make_feeds.py olpark.json feeds
       - name: 바뀐 것이 있으면 저장
         run: |
-          if git diff --quiet -- data_raw/events.json; then
+          if git diff --quiet -- data_raw/events.json && [ -z "$(git status --porcelain feeds)" ]; then
             echo "공연 일정 변화 없음"; exit 0
           fi
           git config user.name "olpark-bot"
           git config user.email "olpark-bot@users.noreply.github.com"
-          git add data_raw/events.json olpark.json
+          git add data_raw/events.json olpark.json feeds
           git commit -m "공연 일정 자동 갱신 $(TZ=Asia/Seoul date '+%Y-%m-%d')"
           git push

@@ -110,6 +110,8 @@ td small{display:block;color:var(--g60);font-size:14px}
 .kp b{display:block;font-size:28px;font-weight:700;letter-spacing:-.02em;color:var(--pri-t)}.kp span{font-size:15px;color:var(--g70)}
 h2.st{font-size:21px;margin:28px 0 4px;font-weight:700}
 .sd{margin:0 0 16px;color:var(--g70);font-size:15px}
+.inf{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;margin:0 0 12px;font-size:15px}.inf b{color:var(--g70);font-weight:600}.inf a{color:var(--pri-t);text-underline-offset:3px}
+.sub{margin-top:20px;padding-top:16px;border-top:1px solid var(--g20,#e1e1e1)}.sub h3{font-size:17px;margin:0 0 6px}.sub p{font-size:15px;color:var(--g70);margin:0 0 12px}
 .stk{display:flex;height:12px;border-radius:2px;overflow:hidden;margin:4px 0 12px;background:var(--surf)}.stk i{display:block;height:100%}
 .leg{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:14px;color:var(--g70);margin-bottom:16px}.leg span{display:inline-flex;align-items:center;gap:6px}
 .scroll{overflow-x:auto}
@@ -184,18 +186,23 @@ dialog textarea{width:100%;height:160px;font:12px/1.4 ui-monospace,monospace;bor
   <div class="leg" id="leg"></div><div id="bandsR"></div>
   <h2 class="st">같은 종목, 센터별 1회당 가격</h2><p class="sd">월 수강료 ÷ (주당 횟수 × 4.3주)의 중앙값입니다. 강좌가 3개 이상인 센터만 표시합니다.</p>
   <div class="scroll"><table id="pt"></table></div>
+  <h2 class="st">공연일 겹침 강좌 명단 (센터 안내용)</h2><p class="sd" id="cln"></p>
+  <p class="sd">공원 안 두 센터의 강좌 중 수업 시간이 공연 시작 2시간 전~3시간 후와 겹치는 것입니다. 명단을 내려받아 센터가 가진 수강생 연락처로 주차·출입 안내 문자를 보낼 수 있습니다. 이 서비스는 회원 정보를 모으지 않습니다.</p>
+  <div class="scroll"><table id="clt"></table></div><p style="margin:12px 0 0"><button class="btn" id="csv">명단 내려받기 (CSV)</button></p>
   <h2 class="st">데이터 기준</h2><p class="sd">공공데이터에는 신청 인원(현원)이 없어 빈자리는 알 수 없습니다. 추가 개방이 필요한 항목입니다.</p>
   <div class="scroll"><table id="fresh"></table></div>
 </main>
 
 <footer><div class="wrap"><b>올팍 운동 시간표</b>
-<p>자료: 공공데이터포털 한국체육산업개발 강좌정보(올림픽수영장 15101610, 올림픽스포츠센터 15110953, 분당 15118652, 일산 15114776), 올림픽공원 공연·행사 일정안내.</p>
+<p>자료: 공공데이터포털 한국체육산업개발 강좌정보(올림픽수영장 15101610, 올림픽스포츠센터 15110953, 분당 15118652, 일산 15114776), 올림픽공원 공연·행사 일정안내, 스포츠센터 강좌 정보(15147992).</p>
 <p>정확한 시간·수강료·신청은 한국체육산업개발 수강신청 누리집에서 확인하십시오.</p></div></footer>
 
 <dialog id="dlg" aria-labelledby="dlgT"><h2 id="dlgT">캘린더에 담기</h2>
 <p style="font-size:15px;color:var(--g70);margin:0 0 12px">아래 내용을 복사해 .ics 파일로 저장하면 매주 반복 일정으로 등록됩니다. 공연일은 메모에 적혀 있습니다.</p>
 <textarea id="ics" readonly aria-label="캘린더 파일 내용"></textarea>
-<div style="display:flex;gap:8px;margin-top:16px;align-items:center"><button class="btn p" id="copy">복사</button><button class="btn" id="close">닫기</button><span id="copied" style="color:var(--g70);font-size:15px"></span></div></dialog>
+<div style="display:flex;gap:8px;margin-top:16px;align-items:center"><button class="btn p" id="copy">복사</button><button class="btn" id="close">닫기</button><span id="copied" style="color:var(--g70);font-size:15px"></span></div>
+<div class="sub" id="subw"><h3>공연일 알림 구독</h3><p>이 강좌 시간에 대형 공연이 겹치는 날만 캘린더에 들어오고, 전날과 수업 2시간 전에 알림이 옵니다. 공연 일정이 바뀌면 매일 자동으로 고쳐집니다. 이름·연락처는 받지 않습니다.</p>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn p" id="subA">캘린더 앱에서 구독</a><button class="btn" id="subC">구독 주소 복사</button></div></div></dialog>
 
 <script>
 {
@@ -250,9 +257,14 @@ function acc(sp,rs,i){
   <span class="m">월 <b>${ps.length?man(Math.min(...ps))+"~"+man(Math.max(...ps))+"원":"금액 정보 없음"}</b>${cmp.length?` · 1회 최저 <b>${krw(cmp[0][1])}원</b>(${SHORT[cmp[0][0]]})`:""}${fl?` · 공연일 겹침 ${fl}건`:""}</span><span class="ar" aria-hidden="true"></span></button></h3>
   <div class="ab" id="${id}"${open?"":" hidden"}>
   ${cmp.length>1?`<div class="cmp"><b>센터별 1회 최저가</b>${cmp.map(([c,v],k)=>`<span class="ctr"><i class="dot" style="background:${CC[c]}"></i>${SHORT[c]} <span${k?"":` class="lo"`}>${krw(v)}원</span></span>`).join("")}</div>`:""}
+  ${infos(rs)}
   <table><caption class="sr">${esc(sp)} 강좌 목록</caption><thead><tr><th>시작</th><th>강좌명</th><th>센터</th><th>요일</th><th>정원</th><th>월 수강료</th><th>신청·일정</th></tr></thead>
   <tbody>${rs.slice(0,lim).map(row).join("")}</tbody></table>
   ${rs.length>lim?`<div class="moreb"><button class="btn" data-more="${esc(sp)}">${rs.length-lim}건 더보기</button></div>`:""}</div></section>`}
+
+function infos(rs){const m=new Map();for(const r of rs)if(r[11]>=0&&!m.has(r[11]))m.set(r[11],r[0]);
+  if(!m.size)return "";
+  return `<p class="inf"><b>강좌 소개·수준별 진도</b>${[...m].map(([k,c])=>`<a href="${esc(D.info[k][1])}" target="_blank" rel="noopener">${SHORT[c]} ${esc(D.info[k][0])}<span class="sr">(새 창)</span></a>`).join("")}</p>`}
 
 function row(r){const i=list.indexOf(r),d=[...DAYS].filter((_,k)=>r[6]>>k&1).join(""),p=per(r);
   return `<tr><td class="t">${fmt(r[4])}</td><td class="l nm">${esc(r[3])} ${r.cl.length?`<span class="bdg" title="${r.cl.map(c=>c[0].slice(5)+" "+c[1]).join(", ")}">공연일 ${r.cl.length}일</span>`:""}</td>
@@ -271,6 +283,12 @@ function ics(r){const by=[...DAYS].map((_,k)=>r[6]>>k&1?["MO","TU","WE","TH","FR
   const dt=m=>iso(s).replace(/-/g,"")+"T"+fmt(m).replace(":","")+"00";
   return ["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//olpark//KO","BEGIN:VEVENT","UID:"+Date.now()+"@olpark","DTSTART;TZID=Asia/Seoul:"+dt(r[4]),"DTEND;TZID=Asia/Seoul:"+dt(r[5]),"RRULE:FREQ=WEEKLY;BYDAY="+by,"SUMMARY:"+r[3],"LOCATION:"+D.centers[r[0]],"DESCRIPTION:"+(r.cl.length?"공연일(주차 혼잡): "+r.cl.map(c=>c[0]+" "+c[1]).join(" / "):"앞으로 4주 공연일 없음"),"END:VEVENT","END:VCALENDAR"].join("\n")}
 
+const feed=r=>new URL("feeds/c_"+r[10]+".ics",location.href).href;
+function clashList(){const out=[];for(const r of rows)for(const c of r.cl)out.push([c[0],D.centers[r[0]],r[2],r[3],fmt(r[4])+"~"+fmt(r[5]),r[9]??"",c[1]+" "+fmt(c[3]),c[2]]);
+  return out.sort((a,b)=>a[0].localeCompare(b[0])||a[4].localeCompare(b[4]))}
+function dl(){const H=["날짜","센터","종목","강좌명","수업시간","정원","공연장·시작","공연명"],q=v=>`"${String(v).replace(/"/g,'""')}"`;
+  const b=new Blob(["\ufeff"+[H,...clashList()].map(r=>r.map(q).join(",")).join("\r\n")],{type:"text/csv"}),a=document.createElement("a");
+  a.href=URL.createObjectURL(b);a.download="공연일_겹침_강좌_"+iso(today)+".csv";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 function report(){
   const cap=f=>rows.filter(f).reduce((a,r)=>a+(r[9]||0),0),tot=cap(()=>1),eve=cap(r=>r[4]>=1080)/tot;
   $("#eve").textContent=(eve*100).toFixed(1)+"%";
@@ -283,6 +301,9 @@ function report(){
   const med=a=>{a=[...a].sort((x,y)=>x-y);return a[Math.floor((a.length-1)/2)]};
   const sps=Object.entries(by).filter(([,o])=>Object.values(o).filter(v=>v.length>=3).length>=2).sort((a,b)=>Object.values(b[1]).flat().length-Object.values(a[1]).flat().length).slice(0,6);
   $("#pt").innerHTML="<caption class='sr'>종목별 센터 1회당 가격</caption><thead><tr><th>종목</th>"+SHORT.map(s=>`<th>${s}</th>`).join("")+"</tr></thead><tbody>"+sps.map(([sp,o])=>`<tr><td>${esc(sp)}</td>${SHORT.map((_,c)=>`<td class="r">${o[c]&&o[c].length>=3?krw(med(o[c]))+"원":"-"}</td>`).join("")}</tr>`).join("")+"</tbody>";
+  const cl=clashList(),byD={};for(const x of cl)(byD[x[0]]??=[]).push(x);
+  $("#cln").textContent=`앞으로 4주 동안 ${Object.keys(byD).length}일, ${cl.length}개 수업(강좌 ${rows.filter(r=>r.cl.length).length}개)이 대형 공연과 겹칩니다.`;
+  $("#clt").innerHTML="<caption class='sr'>공연일 겹침 강좌 명단</caption><thead><tr><th>날짜</th><th>공연</th><th>겹치는 수업</th><th>정원 합계</th></tr></thead><tbody>"+Object.entries(byD).map(([d,xs])=>`<tr><td>${d.slice(5).replace("-",".")}(${DAYS[(new Date(d+"T00:00").getDay()+6)%7]})</td><td class="l">${esc(xs[0][6])}</td><td class="r">${xs.length}개</td><td class="r">${krw(xs.reduce((a,x)=>a+(+x[5]||0),0))}명</td></tr>`).join("")+"</tbody>";
   $("#fresh").innerHTML="<caption class='sr'>센터별 데이터 기준</caption><thead><tr><th>센터</th><th>기준 월</th><th>현재 강좌</th><th>전체 기록</th><th>데이터셋 번호</th></tr></thead><tbody>"+D.centers.map(c=>{const s=D.stats[c];return `<tr><td class="l">${c}</td><td>${s.ref}</td><td class="r">${s.used}</td><td class="r">${krw(s.rows)}</td><td>${s.dataset}</td></tr>`}).join("")+"</tbody>"}
 
 function route(){const r=location.hash==="#report";$("#find").style.display=r?"none":"";$("#report").style.display=r?"block":"none";
@@ -303,11 +324,14 @@ fetch("olpark.json").then(r=>r.json()).then(d=>{D=d;rows=d.rows;
   controls();strip();draw();report();route();
   document.addEventListener("change",e=>{const t=e.target;if(t.dataset.g){const S={d:st.days,b:st.bands,c:st.centers}[t.dataset.g],i=+t.value;t.checked?S.add(i):S.delete(i);st.open=null;draw()}
     if(t.id==="sort"){st.sort=t.value;st.open=null;draw()}});
-  document.addEventListener("click",e=>{const t=e.target.closest("[data-preset],[data-sp],[data-more],[data-ics],#copy,#close,#reset,#go");if(!t)return;
+  document.addEventListener("click",e=>{const t=e.target.closest("[data-preset],[data-sp],[data-more],[data-ics],#copy,#close,#reset,#go,#subC,#csv");if(!t)return;
     if(t.dataset.preset){st.days=new Set(t.dataset.preset==="wd"?[0,1,2,3,4]:[5,6]);st.open=null;controls();draw()}
     else if(t.dataset.sp){const s=t.dataset.sp,o=!st.open.has(s);o?st.open.add(s):st.open.delete(s);t.setAttribute("aria-expanded",o);document.getElementById(t.getAttribute("aria-controls")).hidden=!o}
     else if(t.dataset.more){st.more.add(t.dataset.more);draw()}
-    else if(t.dataset.ics){$("#ics").value=ics(list[+t.dataset.ics]);$("#copied").textContent="";$("#dlg").showModal()}
+    else if(t.dataset.ics){const r=list[+t.dataset.ics];$("#ics").value=ics(r);$("#copied").textContent="";
+      $("#subw").hidden=!r[1];if(r[1]){$("#subA").href=feed(r).replace(/^https?:/,"webcal:");$("#subC").dataset.u=feed(r)}$("#dlg").showModal()}
+    else if(t.id==="subC")navigator.clipboard.writeText(t.dataset.u).then(()=>$("#copied").textContent="구독 주소를 복사했습니다. 캘린더 앱의 '구독 추가'에 붙여 넣으십시오.",()=>prompt("구독 주소",t.dataset.u));
+    else if(t.id==="csv")dl();
     else if(t.id==="copy")navigator.clipboard.writeText($("#ics").value).then(()=>$("#copied").textContent="복사했습니다.",()=>{$("#ics").select();$("#copied").textContent="직접 선택해 복사하십시오."});
     else if(t.id==="close")$("#dlg").close();
     else if(t.id==="reset"){st.days=new Set(DEF.days);st.bands=new Set(DEF.bands);st.centers.clear();st.q="";$("#q").value="";st.open=null;controls();draw()}
