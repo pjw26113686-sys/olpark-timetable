@@ -219,7 +219,7 @@ let EV={};
 
 function clashes(r){if(!r[1])return [];const out=[];
   for(const d of days28){const wd=(d.getDay()+6)%7;if(!(r[6]>>wd&1))continue;
-    for(const e of EV[iso(d)]||[])if(r[4]<e[3]+180&&r[5]>e[3]-120){out.push([iso(d),e[1],e[2],e[3]]);break}}return out}
+    for(const e of EV[iso(d)]||[])if(e[3]!=null&&r[4]<e[3]+180&&r[5]>e[3]-120){out.push([iso(d),e[1],e[2],e[3]]);break}}return out}
 
 function match(r){
   if(st.centers.size&&!st.centers.has(r[0]))return false;
@@ -264,7 +264,7 @@ function strip(){
   $("#strip").innerHTML=days28.map((d,k)=>{const e=EV[iso(d)],wd=(d.getDay()+6)%7,mo=k===0||d.getDate()===1;
     return `<div class="dd${e?" ev":""}${mo?" mo":""}" data-m="${d.getMonth()+1}월"><b>${d.getDate()}</b>${DAYS[wd]}</div>`}).join("");
   const evs=days28.filter(d=>EV[iso(d)]);
-  $("#evl").innerHTML=evs.length?evs.map(d=>`<li><b>${d.getMonth()+1}.${d.getDate()}(${DAYS[(d.getDay()+6)%7]})</b> ${EV[iso(d)].map(x=>esc(x[1])+" "+fmt(x[3])).join(", ")}</li>`).join(""):"<li>앞으로 4주 동안 예정된 대형 공연이 없습니다.</li>"}
+  $("#evl").innerHTML=evs.length?evs.map(d=>`<li><b>${d.getMonth()+1}.${d.getDate()}(${DAYS[(d.getDay()+6)%7]})</b> ${EV[iso(d)].map(x=>esc(x[1])+" "+(x[3]==null?"시간 미정":fmt(x[3]))).join(", ")}</li>`).join(""):"<li>앞으로 4주 동안 예정된 대형 공연이 없습니다.</li>"}
 
 function ics(r){const by=[...DAYS].map((_,k)=>r[6]>>k&1?["MO","TU","WE","TH","FR","SA","SU"][k]:null).filter(Boolean).join(",");
   const s=new Date(today);while(!(r[6]>>((s.getDay()+6)%7)&1))s.setDate(s.getDate()+1);
@@ -297,7 +297,7 @@ function controls(){
   $("#centers").innerHTML=D.centers.map((c,i)=>ck("c",i,st.centers.has(i),SHORT[i],"",`<i class="dot" style="background:${CC[i]}"></i>`)).join("")+`<span style="font-size:14px;color:var(--g60)">미선택 시 전체</span>`}
 
 fetch("olpark.json").then(r=>r.json()).then(d=>{D=d;rows=d.rows;
-  for(const e of d.events)if(BIG.has(e[1])&&e[3]!=null)(EV[e[0]]??=[]).push(e);
+  for(const e of d.events)if(BIG.has(e[1]))(EV[e[0]]??=[]).push(e);
   rows.forEach(r=>r.cl=clashes(r));
   $("#built").textContent="데이터 가공 "+d.built;
   controls();strip();draw();report();route();
