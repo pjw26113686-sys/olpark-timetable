@@ -9,7 +9,7 @@ KEEP = ("evtSeq", "title", "beginDt", "endDt", "tm", "plc", "plcCd")
 
 
 def month_list(n):
-    t = dt.datetime.utcnow() + dt.timedelta(hours=9)  # 한국 시간
+    t = dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=9)  # 한국 시간
     y, m = t.year, t.month
     for _ in range(n):
         yield f"{y}{m:02d}"
