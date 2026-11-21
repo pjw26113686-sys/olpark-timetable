@@ -199,7 +199,7 @@ rows = [[centers.index(x["c"]), int(x["park"]), x["sp"], x["n"], x["s"], x["e"],
          sum(1 << i for i in x["d"]), x["t"], x["p"], x["cap"]] for x in courses]
 evs = [[e["date"], e["v"], e["title"], e["s"]] for e in events]
 json.dump(dict(centers=centers, stats=stats, events=evs, rows=rows,
-               built=dt.datetime.now().strftime("%Y-%m-%d %H:%M")),
+               built=(dt.datetime.now(dt.timezone.utc) + dt.timedelta(hours=9)).strftime("%Y-%m-%d %H:%M")),
           open(OUT, "w", encoding="utf-8"), ensure_ascii=False, separators=(",", ":"))
 print(json.dumps(stats, ensure_ascii=False, indent=1))
 print("courses", len(courses), "events", len(events))
