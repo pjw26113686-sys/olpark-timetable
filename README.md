@@ -17,9 +17,12 @@
 | `olpark.json` | 화면용 데이터(강좌 1,294개, 공연일 61회분) |
 | `PretendardGOV-sub.woff2` | 정부 공식 서체 Pretendard GOV, 쓰는 글자만 남긴 파일(SIL OFL) |
 | `.nojekyll` | GitHub Pages가 파일을 그대로 쓰게 하는 빈 파일 |
-| `scripts/build_data.py` | 원본 CSV + 공연 일정 HTML → `olpark.json` |
+| `scripts/build_data.py` | 원본 CSV + 공연 일정 → `olpark.json` |
+| `scripts/fetch_events.py` | 올림픽공원 일정안내의 공연 목록 받기 → `data_raw/events.json` |
+| `.github/workflows/update-events.yml` | 매일 05:17(한국 시간) 공연 일정을 받아 바뀌었으면 `olpark.json`을 다시 만들어 올림 |
 | `scripts/dl_filedata.py` | 공공데이터포털 파일데이터 내려받기 |
 | `data_raw/g_*.csv` | 강좌정보 원본 4종(UTF-8로 변환한 것) |
+| `data_raw/events.json` | 공연 일정(자동 갱신) |
 
 디자인 기준: 범정부 UI/UX 디자인 시스템(KRDS) — 정부 청색 #256EF4, Pretendard GOV, 본문 17px, 버튼 48px.
 
@@ -43,7 +46,7 @@ python3 -m http.server 8765
    for pk in 15101610 15110953 15118652 15114776; do python3 -I scripts/dl_filedata.py $pk data_raw/g_$pk.bin; done
    for f in data_raw/g_*.bin; do iconv -f cp949 -t utf-8 "$f" > "${f%.bin}.csv"; done
    ```
-2. 공연 일정: 올림픽공원 누리집 → 문화공간 → 공연/행사안내 → **일정안내(이미지보기)** 페이지를 브라우저에서 '다른 이름으로 저장'해 `data_raw/ev.html`로 둡니다. (스크립트는 이 파일의 공연장·기간·시작 시각 문장을 읽습니다.)
+2. 공연 일정: **자동으로 갱신됩니다**(GitHub Actions '공연 일정 자동 갱신', 매일). 직접 받으려면 `python3 -I scripts/fetch_events.py data_raw/events.json 3` (이번 달부터 3개월). `events.json`이 없으면 예전 방식대로 일정안내 페이지를 저장한 `data_raw/ev.html`을 읽습니다.
 3. 가공:
    ```bash
    pip install pandas
