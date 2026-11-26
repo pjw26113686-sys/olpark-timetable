@@ -66,13 +66,13 @@
    "plcCd": "02"
   },
   {
-   "evtSeq": 5178,
-   "title": "2026 DAY6 Special Concert ‘The Present’",
+   "evtSeq": 5186,
+   "title": "2026 XIA Musical Concert with Orchestra Vol.9",
    "beginDt": "2026-12-18",
    "endDt": "2026-12-20",
-   "tm": "2026.12.18. FRI 7PM / 12.19 SAT 6PM / 12.20 SUN 5PM(KST)",
-   "plc": "KSPO DOME",
-   "plcCd": "02"
+   "tm": "2026년 12월 18일(금) 7:30PM(KST) 2026년 12월 19일(토) 6PM(KST) 2026년 12월 20일(일) 5PM(KST)",
+   "plc": "티켓링크 라이브 아레나",
+   "plcCd": "03"
   },
   {
    "evtSeq": 5174,
@@ -82,6 +82,15 @@
    "tm": "2026년 12월 18일(금) 오후 8시 2026년 12월 19일(토) 오후 6시 2026년 12월 20일(일) 오후 5",
    "plc": "올림픽홀",
    "plcCd": "01"
+  },
+  {
+   "evtSeq": 5178,
+   "title": "2026 DAY6 Special Concert ‘The Present’",
+   "beginDt": "2026-12-18",
+   "endDt": "2026-12-20",
+   "tm": "2026.12.18. FRI 7PM / 12.19 SAT 6PM / 12.20 SUN 5PM(KST)",
+   "plc": "KSPO DOME",
+   "plcCd": "02"
   },
   {
    "evtSeq": 5170,
