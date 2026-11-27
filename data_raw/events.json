@@ -42,8 +42,8 @@
    "evtSeq": 5182,
    "title": "2026 CRUSH CONCERT [CRUSH H♥UR]",
    "beginDt": "2026-12-25",
-   "endDt": "2026-12-26",
-   "tm": "금 18시 30분 / 토 18시",
+   "endDt": "2026-12-27",
+   "tm": "금 18시 30분 / 토 18시 / 일 17시",
    "plc": "티켓링크 라이브 아레나(핸드볼경기장)",
    "plcCd": "03"
   },
@@ -66,15 +66,6 @@
    "plcCd": "02"
   },
   {
-   "evtSeq": 5186,
-   "title": "2026 XIA Musical Concert with Orchestra Vol.9",
-   "beginDt": "2026-12-18",
-   "endDt": "2026-12-20",
-   "tm": "2026년 12월 18일(금) 7:30PM(KST) 2026년 12월 19일(토) 6PM(KST) 2026년 12월 20일(일) 5PM(KST)",
-   "plc": "티켓링크 라이브 아레나",
-   "plcCd": "03"
-  },
-  {
    "evtSeq": 5174,
    "title": "자우림 단독 콘서트 ［ MIDNIGHT EXPRESS 2026-2027 ］ - 서울",
    "beginDt": "2026-12-18",
@@ -91,6 +82,15 @@
    "tm": "2026.12.18. FRI 7PM / 12.19 SAT 6PM / 12.20 SUN 5PM(KST)",
    "plc": "KSPO DOME",
    "plcCd": "02"
+  },
+  {
+   "evtSeq": 5186,
+   "title": "2026 XIA Musical Concert with Orchestra Vol.9",
+   "beginDt": "2026-12-18",
+   "endDt": "2026-12-20",
+   "tm": "2026년 12월 18일(금) 7:30PM(KST) 2026년 12월 19일(토) 6PM(KST) 2026년 12월 20일(일) 5PM(KST)",
+   "plc": "티켓링크 라이브 아레나",
+   "plcCd": "03"
   },
   {
    "evtSeq": 5170,
